@@ -1,0 +1,2 @@
+console.log('1+1');
+console.log('La liste des zones de Sonic the Hedgehog recense les noms et les présentations simplifiées denvironnements visitables dans les jeux qui se déroulent dans lunivers fictif de Sonic.'.length);
