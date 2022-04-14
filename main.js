@@ -135,7 +135,6 @@ var app = http.createServer(function(request,response){
           var id = post.id;
           var title = post.title;
           var description = post.description
-          console.log(post);
           fs.rename(`data/${id}`, `data/${title}`, function(error){
             fs.writeFile(`data/${title}`, description, 'utf8', function(err){});
             response.writeHead(302,{Location :`/?id=${title}`});
@@ -143,7 +142,21 @@ var app = http.createServer(function(request,response){
           });
       });
 
-    }else {
+    }else if (pathname === '/delete_process'){ //글 삭제기능
+      var body = '';
+      request.on('data', function(data){
+          body = body + data;
+      });
+      request.on('end', function(){
+          var post = qs.parse(body);
+          var id = post.id;
+          fs.unlink(`data/${id}`, function(error){
+            response.writeHead(302,{Location :`/`}); //home 으로 보내기
+            response.end();
+
+          });
+      });
+    } else {
       response.writeHead(404);
       response.end('Not found');
     }
