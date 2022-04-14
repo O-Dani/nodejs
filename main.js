@@ -83,9 +83,11 @@ var app = http.createServer(function(request,response){
           var post = qs.parse(body);
           var title = post.title;
           var description = post.description
+          fs.writeFile(`data/${title}`, description, 'utf8', function(err){});//에러가 있을경우 처리하는 방법
+            response.writeHead(302,{Location :`/?id=${title}`});//성공시 200 , 실패시 404, 302는 redirection
+            response.end();
       });
-      response.writeHead(200);
-      response.end('success');
+      
     } else {
       response.writeHead(404);
       response.end('Not found');
