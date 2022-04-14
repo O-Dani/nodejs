@@ -1,30 +1,28 @@
-var http = require('http');
+var http = require('http'); // 클라이언트에서 요청이 오면 이 함수가 실행된다.
 var fs = require('fs');
 var url = require('url');
 var qs = require('querystring');
  
-function templateHTML(title,list,body){ //template이란 재사용할수있는 껍대기
-  return`
-          <!doctype html>
-          <html>
-          <head>
-            <title>WEB1 - ${title}</title>
-            <meta charset="utf-8">
-          </head>
-          <body>
-            <h1><a href="/">WEB</a></h1>
-            ${list}
-            <a href="/create">create</a>
-            ${body}
-          </body>
-          </html>
-          `;
-
+function templateHTML(title, list, body){
+  return `
+  <!doctype html>
+  <html>
+  <head>
+    <title>WEB1 - ${title}</title>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <h1><a href="/">WEB</a></h1>
+    ${list}
+    <a href="/create">create</a>
+    ${body}
+  </body>
+  </html>
+  `;
 }
-
 function templateList(filelist){
   var list = '<ul>';
-  var i =0;
+  var i = 0;
   while(i < filelist.length){
     list = list + `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
     i = i + 1;
@@ -32,88 +30,63 @@ function templateList(filelist){
   list = list+'</ul>';
   return list;
 }
-
+ 
 var app = http.createServer(function(request,response){
     var _url = request.url;
     var queryData = url.parse(_url, true).query;
     var pathname = url.parse(_url, true).pathname;
     if(pathname === '/'){
       if(queryData.id === undefined){
- 
-        fs.readdir('./data',function(error, filelist){
+        fs.readdir('./data', function(error, filelist){
           var title = 'Welcome';
           var description = 'Hello, Node.js';
           var list = templateList(filelist);
-          var template = templateHTML(title,list,`<h2>${title}</h2><p>${description}</p>`);
+          var template = templateHTML(title, list, `<h2>${title}</h2>${description}`);
           response.writeHead(200);
           response.end(template);
         });
- 
- 
       } else {
         fs.readdir('./data', function(error, filelist){
-          var list=templateList(filelist);
           fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
             var title = queryData.id;
-            var template = templateHTML(title, list, `<h2>${title}</h2><p>${description}</p>`);
+            var list = templateList(filelist);
+            var template = templateHTML(title, list, `<h2>${title}</h2>${description}`);
             response.writeHead(200);
             response.end(template);
           });
         });
       }
     } else if(pathname === '/create'){
-      fs.readdir('./data',function(error, filelist){
-        var title = 'Web-Create';
+      fs.readdir('./data', function(error, filelist){
+        var title = 'WEB - create';
         var list = templateList(filelist);
-        var template = templateHTML(title,list,`
-<<<<<<< HEAD
-        <form action="http://localhost:3000/create_process" method="post"> <!-- with method 은밀하게 서버로 보냄,main.js가 켜져있어야됨
-        post 방법으로 전송된 데이터-->
-          <p><input type='text' name="title" placeholder="텍스트"></p> <!--텍스트 입력 -->
-          <p>
-              <textarea name="description" placeholder="description"></textarea> <!--텍스트 영역 -->
-=======
-        <form action="http://localhost:3000/process_create" method="post"> <!-- with method 은밀하게 서버로 보냄,main.js가 켜져있어야됨-->
-          <p><input type='text' name="title" placeholer="텍스트"></p> <!--텍스트 입력 -->
-          <p>
-              <textarea></textarea> <!--텍스트 영역 -->
->>>>>>> ceb9c038ddccca99be4d9f31dd964af2e8894c54
-          </p>
-          <p>
+        var template = templateHTML(title, list, `
+          <form action="http://localhost:3000/create_process" method="post">
+            <p><input type="text" name="title" placeholder="title"></p>
+            <p>
+              <textarea name="description" placeholder="description"></textarea>
+            </p>
+            <p>
               <input type="submit">
-          </p>
-<<<<<<< HEAD
-        </form>
-=======
+            </p>
           </form>
->>>>>>> ceb9c038ddccca99be4d9f31dd964af2e8894c54
         `);
         response.writeHead(200);
         response.end(template);
       });
-
-<<<<<<< HEAD
     } else if(pathname === '/create_process'){
       var body = '';
       request.on('data', function(data){
-        body = body + data;
+          body = body + data;
       });
       request.on('end', function(){
-        var post = qs.parse(body);
-        var title = post.title;
-        var description = post.description;
-        consel.log(post);
-
+          var post = qs.parse(body);
+          var title = post.title;
+          var description = post.description
       });
-
       response.writeHead(200);
       response.end('success');
-
-    }
-=======
-    } 
->>>>>>> ceb9c038ddccca99be4d9f31dd964af2e8894c54
-    else {
+    } else {
       response.writeHead(404);
       response.end('Not found');
     }
